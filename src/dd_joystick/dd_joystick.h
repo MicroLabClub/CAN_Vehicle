@@ -3,10 +3,15 @@
 #define DD_JOYSTICK_H_
 
 // Joystick PinMap
-#define DD_JOYSTICK_Y A0
-#define DD_JOYSTICK_X A1
+#define DD_JOYSTICK_X A0
+#define DD_JOYSTICK_Y A1
 #define DD_JOYSTICK_B A2
+
+
+
 #include "stdint.h"
+
+#include "ecu_config.h"
 
 void dd_joystick_setup();
 void dd_joystick_loop();

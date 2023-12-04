@@ -1,0 +1,36 @@
+{
+	"folders": [
+		{
+			"name": "CAN_Vehicle",
+			"path": "."
+		},
+		{
+			"path": "../IoT_GreenHouse_ctrl"
+		},
+		{
+			"name": "Test_ESP32",
+			"path": "../../Documents/PlatformIO/Projects/Test_ESP32"
+		},
+		{
+			"name": "IoT_ThingsBoard_IO",
+			"path": "../IoT_ThingsBoard_IO"
+		},
+		{
+			"path": "../IoT_21_ThingsBoard"
+		},
+		{
+			"path": "../GitHub_Esp32-ThingsBoard-Example-main"
+		},
+		{
+			"path": "../GitHub_ThingsBoard-main"
+		},
+		{
+			"path": "../GitHub_ThingsBoard_meteotron-main"
+		},
+		{
+			"name": "IoT_HiveMQ",
+			"path": "../../Documents/PlatformIO/Projects/IoT_HiveMQ"
+		}
+	],
+	"settings": {}
+}
