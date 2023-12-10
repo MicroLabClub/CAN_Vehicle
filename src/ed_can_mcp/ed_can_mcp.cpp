@@ -28,15 +28,15 @@ void dd_can_setup()
 
   // Initialize MCP2515 running at 16MHz with a baudrate of 500kb/s and the masks and filters disabled.
   if (CAN0.begin(MCP_ANY, CAN_500KBPS, MCP_16MHZ) == CAN_OK)
-    Serial.println("MCP2515 Initialized Successfully!");
+    Serial.println(F("MCP2515 Initialized Successfully!"));
   else
-    Serial.println("Error Initializing MCP2515...");
+    Serial.println(F("Error Initializing MCP2515..."));
   // Change to normal mode to allow messages to be transmitted
   CAN0.setMode(MCP_NORMAL);
   // Configuring pin for /INT input (optional)
   pinMode(CAN0_INT, INPUT);
 
-  Serial.println("MCP2515 Driver started...");
+  Serial.println(F("MCP2515 Driver started..."));
 }
 
 
@@ -101,7 +101,7 @@ void dd_can_send_loop()
     }
     else
     {
-      Serial.println("Error Sending Message...");
+      Serial.println(F("Error Sending Message..."));
     }
   }
 }
@@ -112,7 +112,7 @@ char can_msg_string[256]; // Array to store serial string
 
 void dd_can_tx_buff_print()
 {
-  Serial.println("CAN_TX report:");
+  Serial.println(F("CAN_TX report:"));
 
     sprintf(can_msg_string, "CAN_TX ID: 0x%.4X Data:", (uint16_t)txId);
     Serial.print(can_msg_string);
@@ -127,7 +127,7 @@ void dd_can_tx_buff_print()
 }
 void dd_can_rx_buff_print()
 {
-  Serial.println("CAN_RX report:");
+  Serial.println(F("CAN_RX report:"));
 
     sprintf(can_msg_string, "CAN_RX ID: 0x%.4X Data:", (uint16_t)txId);
     Serial.print(can_msg_string);
@@ -142,7 +142,7 @@ void dd_can_rx_buff_print()
 }
 void dd_can_buff_print(uint16_t can_id, uint8_t* can_data)
 {
-  Serial.println("CAN_BUFF report:");
+  Serial.println(F("CAN_BUFF report:"));
 
     sprintf(can_msg_string, "CAN_RX ID: 0x%.4X Data:", can_id);
     Serial.print(can_msg_string);

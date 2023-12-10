@@ -2,8 +2,9 @@
 #define ECU_CONFIG_H_
 
 #define ECU_TST 0
-#define ECU_LCD 1
-#define ECU_JOISTICK 2
+#define ECU_UI_LCD 1
+#define ECU_UI_BLUETOOTH 2
+#define ECU_TRACTION 3
 
 
 #define ECU_OMNI_WHEEL_FL 3
@@ -15,35 +16,105 @@
 
 
 
-#define ECU_CONFIG ECU_TST
+// #define ECU_CONFIG ECU_UI_BLUETOOTH
+// #define ECU_CONFIG ECU_UI_LCD
+#define ECU_CONFIG ECU_TRACTION
+// #define ECU_CONFIG ECU_DIRECTION
+// #define ECU_CONFIG ECU_TST
+
+
 
 #define CAN_ID_BUZZER   0x111
 #define CAN_ID_JOYSTICK 0x222
 #define CAN_ID_UI_BT    0x055
+#define CAN_ID_UI_BT_CHASSIS    0x077
 // to implement a claim mechanism on can
 // when many ecu reports the same message
 
 
 #if ECU_CONFIG == ECU_TST 
 
+#define USE_SRV_UI_SERIAL
+#define USE_DC_MOTOR
+#define USE_DD_JOYSTICK
+#define USE_ED_BUZZER
+#define USE_ED_CAN_MCP
+#define USE_ED_ESC
+#define USE_DD_ENCODER
+#define USE_ED_L298
+#define USE_SRV_COM_CAN
+#define USE_SRV_CONTROL
+#define USE_SRV_UI_BT
+#define USE_SRV_UI_LCD
+#define USE_CTRL_TRACTION
+
+
+#define TX_CAN_ID_NR_OF 4
+#define TX_CAN_ID_LIST {CAN_ID_BUZZER, CAN_ID_JOYSTICK, CAN_ID_UI_BT, CAN_ID_UI_BT_CHASSIS}
+#define RX_CAN_ID_NR_OF 4
+#define RX_CAN_ID_LIST {CAN_ID_JOYSTICK, CAN_ID_BUZZER, CAN_ID_UI_BT, CAN_ID_UI_BT_CHASSIS}
+
+#elif ECU_CONFIG == ECU_UI_LCD
+
+#define USE_SRV_UI_SERIAL
+// #define USE_DC_MOTOR
+// #define USE_DD_JOYSTICK
+#define USE_ED_BUZZER
+#define USE_ED_CAN_MCP
+// #define USE_ED_ESC
+#define USE_DD_ENCODER
+// #define USE_ED_L298
+#define USE_SRV_COM_CAN
+// #define USE_SRV_CONTROL
+// #define USE_SRV_UI_BT
+#define USE_SRV_UI_LCD
+
+
+#define TX_CAN_ID_NR_OF 0
+#define TX_CAN_ID_LIST {}
+#define RX_CAN_ID_NR_OF 4
+#define RX_CAN_ID_LIST {CAN_ID_JOYSTICK, CAN_ID_BUZZER, CAN_ID_UI_BT, CAN_ID_UI_BT_CHASSIS}
+
+#elif ECU_CONFIG == ECU_UI_BLUETOOTH
+
+#define USE_SRV_UI_SERIAL
+// #define USE_DC_MOTOR
+#define USE_DD_JOYSTICK
+// #define USE_ED_BUZZER
+#define USE_ED_CAN_MCP
+// #define USE_ED_ESC
+// #define USE_DD_ENCODER
+// #define USE_ED_L298
+#define USE_SRV_COM_CAN
+// #define USE_SRV_CONTROL
+#define USE_SRV_UI_BT
+// #define USE_SRV_UI_LCD
+
 #define TX_CAN_ID_NR_OF 3
-#define TX_CAN_ID_LIST {CAN_ID_BUZZER, CAN_ID_JOYSTICK, CAN_ID_UI_BT}
-#define RX_CAN_ID_NR_OF 3
-#define RX_CAN_ID_LIST {CAN_ID_JOYSTICK, CAN_ID_BUZZER, CAN_ID_UI_BT}
+#define TX_CAN_ID_LIST {CAN_ID_JOYSTICK, CAN_ID_UI_BT, CAN_ID_UI_BT_CHASSIS}
+#define RX_CAN_ID_NR_OF 0
+#define RX_CAN_ID_LIST {}
 
-#elif ECU_CONFIG == ECU_LCD
+#elif ECU_CONFIG == ECU_TRACTION        
 
-#define TX_CAN_ID_NR_OF 1
-#define TX_CAN_ID_LIST {CAN_ID_BUZZER}
+#define USE_SRV_UI_SERIAL
+#define USE_DD_DC_MOTOR
+// #define USE_DD_JOYSTICK
+// #define USE_ED_BUZZER
+#define USE_ED_CAN_MCP
+// #define USE_ED_ESC
+// #define USE_DD_ENCODER
+#define USE_ED_L298
+#define USE_SRV_COM_CAN
+// #define USE_SRV_CONTROL
+// #define USE_SRV_UI_BT
+// #define USE_SRV_UI_LCD
+#define USE_CTRL_TRACTION
+
+#define TX_CAN_ID_NR_OF 0
+#define TX_CAN_ID_LIST {}
 #define RX_CAN_ID_NR_OF 1
-#define RX_CAN_ID_LIST {CAN_ID_JOYSTICK}
-
-#elif ECU_CONFIG == ECU_JOISTICK
-
-#define TX_CAN_ID_NR_OF 1
-#define TX_CAN_ID_LIST {CAN_ID_JOYSTICK}
-#define RX_CAN_ID_NR_OF 1
-#define RX_CAN_ID_LIST {CAN_ID_BUZZER}
+#define RX_CAN_ID_LIST {CAN_ID_UI_BT_CHASSIS}
 
 #endif
 
