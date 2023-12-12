@@ -11,7 +11,7 @@ long unsigned int rxId;
 long unsigned int txId;
 
 
-unsigned char len = 0;
+unsigned char dd_can_msg_len = CAN_MESSAGE_LEN;
 uint8_t dd_can_rx_data[CAN_MESSAGE_LEN];
 uint8_t dd_can_tx_data[CAN_MESSAGE_LEN];
 // uint8_t dd_can_tx_data[CAN_MESSAGE_LEN] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
@@ -49,7 +49,7 @@ void dd_can_recv_loop()
   // if (!digitalRead(CAN0_INT)) // If CAN0_INT pin is low, read receive buffer
   {
     // Read data: len = data length, buf = data byte(s)
-    CAN0.readMsgBuf(&rxId, &len, dd_can_rx_data);
+    CAN0.readMsgBuf(&rxId, &dd_can_msg_len, dd_can_rx_data);
     // Determine if ID is standard (11 bits) or extended (29 bits)
     if ((rxId & 0x80000000) == 0x80000000)
     {
@@ -70,7 +70,7 @@ void dd_can_recv_loop()
     else
     {
       // dd_can_rx_buff_print();
-      dd_can_matrix_rx_set(rxId, dd_can_rx_data, len);
+      dd_can_matrix_rx_set(rxId, dd_can_rx_data, dd_can_msg_len);
     }
   }
 }
@@ -85,19 +85,19 @@ void dd_can_send_loop()
     uint32_t *tx_id_list = ed_can_mcp_get_tx_can_list_ref();
     txId = tx_id_list[tx_id_it];
 
-    dd_can_matrix_tx_get(txId, dd_can_tx_data, len);
+    dd_can_matrix_tx_get(txId, dd_can_tx_data, dd_can_msg_len);
 
     // send data to the CAN network
     byte sndStat = CAN0.sendMsgBuf(txId,            // ID = 0x100,
                                    0,               // Standard CAN Frame,
-                                   8,               // Data length = 8 bytes,
+                                   dd_can_msg_len,               // Data length = dd_can_msg_len bytes,
                                    dd_can_tx_data); // 'data' = array of data bytes to send
     // Check the status for sending
     if (sndStat == CAN_OK)
     {
       // Serial.println("Message Sent Successfully!");
       // dd_can_tx_buff_print();
-      dd_can_matrix_tx_set(txId, dd_can_tx_data, 8);
+      dd_can_matrix_tx_set(txId, dd_can_tx_data, dd_can_msg_len);
     }
     else
     {
@@ -117,7 +117,7 @@ void dd_can_tx_buff_print()
     sprintf(can_msg_string, "CAN_TX ID: 0x%.4X Data:", (uint16_t)txId);
     Serial.print(can_msg_string);
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < dd_can_msg_len; i++)
     {
       sprintf(can_msg_string, " %.2X", dd_can_tx_data[i]);
       Serial.print(can_msg_string);
@@ -132,7 +132,7 @@ void dd_can_rx_buff_print()
     sprintf(can_msg_string, "CAN_RX ID: 0x%.4X Data:", (uint16_t)txId);
     Serial.print(can_msg_string);
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < dd_can_msg_len; i++)
     {
       sprintf(can_msg_string, " %.2X", dd_can_rx_data[i]);
       Serial.print(can_msg_string);
@@ -147,7 +147,7 @@ void dd_can_buff_print(uint16_t can_id, uint8_t* can_data)
     sprintf(can_msg_string, "CAN_RX ID: 0x%.4X Data:", can_id);
     Serial.print(can_msg_string);
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < dd_can_msg_len; i++)
     {
       sprintf(can_msg_string, " %.2X", can_data[i]);
       Serial.print(can_msg_string);

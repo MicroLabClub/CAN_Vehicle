@@ -55,6 +55,9 @@
 #ifdef USE_CTRL_TRACTION
 #include "ctrl_traction/ctrl_traction.h"
 #endif
+#ifdef USE_CTRL_STEERING
+#include "ctrl_steering/ctrl_steering.h"
+#endif
 
 void setup()
 {
@@ -81,11 +84,9 @@ void setup()
 #ifdef USE_ED_L298
   ed_l298_setup();
 #endif
-#ifdef USE_CTRL_TRACTION
-  ctrl_traction_setup();
-#endif
-#ifdef USE_DC_MOTOR
-  // dd_dc_motor_setup(); ??????
+
+#ifdef USE_DD_DC_MOTOR
+  dd_dc_motor_setup(); 
 #endif
 
 #ifdef USE_SRV_CONTROL
@@ -98,7 +99,15 @@ void setup()
 #ifdef USE_SRV_UI_BT
   srv_ui_bt_setup();
 #endif
+
+#ifdef USE_CTRL_TRACTION
+  ctrl_traction_setup();
+#endif
+#ifdef USE_CTRL_STEERING
+  ctrl_steering_setup();
+#endif
 }
+
 
 #define SYS_TICK 1
 
@@ -137,6 +146,10 @@ int ed_l298_rec_cnt = ED_L298_REC + 5;
 
 #define CTRL_TRACTION_REC (1000 / SYS_TICK)
 int ctrl_traction_rec_cnt = CTRL_TRACTION_REC + 5;
+
+#define CTRL_STEERING_REC (100 / SYS_TICK)
+int ctrl_steering_rec_cnt = CTRL_STEERING_REC + 5;
+
 
 #define DD_DC_MOTOR_REC (100 / SYS_TICK)
 int dd_dc_motor_rec_cnt = DD_DC_MOTOR_REC + 5;
@@ -181,6 +194,14 @@ void loop()
   { // send data per 10ms
     ctrl_traction_loop();
     ctrl_traction_rec_cnt = CTRL_TRACTION_REC;
+  }
+#endif
+
+#ifdef USE_CTRL_STEERING
+  if (--ctrl_steering_rec_cnt <= 0)
+  { // send data per 10ms
+    ctrl_steering_loop();
+    ctrl_steering_rec_cnt = CTRL_STEERING_REC;
   }
 #endif
 

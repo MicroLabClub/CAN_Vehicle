@@ -20,6 +20,9 @@
 #ifdef USE_SRV_COM_CAN
 #include "srv_com_can/srv_com_can_matrix.h"
 #endif
+#ifdef USE_SRV_UI_BT
+#include "srv_ui_bt/srv_ui_bt.h"
+#endif
 
 //=============================================================================
 // Devise abstraction components
@@ -30,10 +33,9 @@
 #ifdef USE_DD_JOYSTICK
 #include "dd_joystick/dd_joystick.h"
 #endif
-#ifdef USE_ED_ED_ENCODER
-#include "ed_encoder/ed_encoder.h"
+#ifdef USE_DD_ENCODER
+#include "dd_encoder/dd_encoder.h"
 #endif
-
 
 // ECU Abstraction components
 #ifdef USE_ED_CAN_MCP
@@ -42,8 +44,6 @@
 #ifdef USE_ED_L298
 #include "ed_l298/ed_l298.h"
 #endif
-
-
 
 void srv_ui_serial_setup()
 {
@@ -66,7 +66,7 @@ void srv_ui_serial_in_loop()
 
     case 'x': //  manual or automat control
 #if defined USE_CTRL_TRACTION
-      if (ctrl_traction_is_enable())
+      if (ctrl_traction_is_enabled())
       { // go to manual control
         Serial.println(" CTRL_TRACTION:  Change mode to MANUAL");
         ctrl_traction_disable();
@@ -77,7 +77,7 @@ void srv_ui_serial_in_loop()
         ctrl_traction_enable();
       }
 #elif defined USE_DD_DC_MOTOR
-      dd_dc_motor_set_power(DD_DC_MOTOR_ID_1,0);
+      dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, 0);
       Serial.println("DD_MOTOR: STOP Command");
 #elif defined USE_ED_L298
       Serial.println("DD_L298: STOP Command");
@@ -89,10 +89,18 @@ void srv_ui_serial_in_loop()
 
     case 'w': // UP
 #if defined USE_CTRL_TRACTION
-      if (ctrl_traction_is_enable()==0)
+      if (ctrl_traction_is_enabled())
       {
-        ctrl_traction_power_up(10);
-        Serial.println("CTRL_TRACTION: Manual Motor power UP");
+        if (ctrl_traction_is_step_mode())
+        {
+          ctrl_traction_step_up(10);
+          Serial.println("CTRL_TRACTION: Step UP");
+        }
+        else
+        {
+          ctrl_traction_power_up(10);
+          Serial.println("CTRL_TRACTION: Manual Motor power UP");
+        }
       }
 #elif defined USE_DD_DC_MOTOR
       dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, 255);
@@ -107,10 +115,19 @@ void srv_ui_serial_in_loop()
 
     case 's': // Down
 #if defined USE_CTRL_TRACTION
-      if (ctrl_traction_is_enable( )==0)
+      if (ctrl_traction_is_enabled())
       {
-        ctrl_traction_power_down(10);
-        Serial.println("CTRL_TRACTION: Manual Motor power DOWN");
+
+        if (ctrl_traction_is_step_mode())
+        {
+          ctrl_traction_step_down(10);
+          Serial.println("CTRL_TRACTION: Step DOWN");
+        }
+        else
+        {
+          ctrl_traction_power_down(10);
+          Serial.println("CTRL_TRACTION: Manual Motor power DOWN");
+        }
       }
 #elif defined USE_DD_DC_MOTOR
       dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, -255);
@@ -122,7 +139,64 @@ void srv_ui_serial_in_loop()
       Serial.println("CTRL_TRACTION: CLOSE/SP_Dn Command <no action>");
 #endif
       break;
+    case 'z': //  manual or automat control
+#if defined USE_CTRL_STEERING
+      if (ctrl_steering_is_enabled())
+      { // go to manual control
+        Serial.println(" CTRL_STEERING: Change mode to MANUAL");
+        ctrl_steering_disable();
+      }
+      else
+      { // go to automat control
+        Serial.println(" CTRL_STEERING: Change mode to AUTO");
+        ctrl_steering_enable();
+      }
+#elif defined USE_DD_DC_MOTOR
+      dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, 0);
+      Serial.println("DD_MOTOR: STOP Command");
+#elif defined USE_ED_L298
+      Serial.println("DD_L298: STOP Command");
+      ed_l298_set(ED_L298_ID_1, LOW, LOW, 0);
+#else
+      Serial.println("CTRL_STEERING: AUTO/MANUAL/STOP Command <no action>");
+#endif
+      break;
 
+    case 'a': // LEFT
+#if defined USE_CTRL_STEERING
+      if (ctrl_steering_is_enabled())
+      {
+        ctrl_steering_turn_left(10);
+        Serial.println("CTRL_STEERING: Turn left");
+      }
+#elif defined USE_DD_DC_MOTOR
+      dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, 255);
+      Serial.println("DD_MOTOR: Motor forward");
+#elif defined USE_ED_L298
+      ed_l298_set(ED_L298_ID_1, LOW, HIGH, 255);
+      Serial.println("DD_MOTOR: Motor Forward");
+#else
+      Serial.println("CTRL_STEERING: UP Command <no action>");
+#endif
+      break;
+
+    case 'd': // Right
+#if defined USE_CTRL_STEERING
+      if (ctrl_steering_is_enabled())
+      {
+        ctrl_steering_turn_right(10);
+        Serial.println("CTRL_STEERING: Turn right");
+      }
+#elif defined USE_DD_DC_MOTOR
+      dd_dc_motor_set_power(DD_DC_MOTOR_ID_1, -255);
+      Serial.println("DD_MOTOR: Motor backward");
+#elif defined USE_ED_L298
+      ed_l298_set(ED_L298_ID_1, HIGH, LOW, 255);
+      Serial.println(" ED_L298: Motor Backward");
+#else
+      Serial.println("CTRL_STEERING: DOWN Command <no action>");
+#endif
+      break;
     default:
       break;
     }
@@ -133,7 +207,7 @@ void srv_ui_serial_out_loop()
 {
   Serial.println(F("=============== Vehicle System Report =============== "));
 #ifdef USE_SRV_COM_CAN
-    dd_can_matrix_print();
+  dd_can_matrix_print();
 #endif
 #ifdef USE_CTRL_STEERING
   srv_ui_serial_ctrl_steering_report();
@@ -154,51 +228,15 @@ void srv_ui_serial_out_loop()
   srv_ui_serial_ed_pot_report();
 #endif
 #ifdef USE_DD_JOYSTICK
-    dd_joystick_report();
+  dd_joystick_report();
 #endif
 #ifdef USE_DD_ENCODER
-    dd_encoder_report();
+  dd_encoder_report();
 #endif
 #ifdef USE_SRV_UI_BT
-    srv_ui_bt_report();
+  srv_ui_bt_report();
 #endif
   Serial.println();
-
-
-}
-
-void srv_ui_serial_ctrl_steering_report()
-{
-#ifdef USE_CTRL_STEERING
-
-  if (ctrl_steering_is_enabled())
-  {
-    Serial.println(F("CTRL_STEERING: Mode AUTO "));
-  }
-  else
-  {
-    Serial.println(F("CTRL_STEERING: Mode MANUAL"));
-  }
-
-  float temp_setpoint = ctrl_steering_get_setpoint();
-  Serial.print(F("CTRL_STEERING: SP: "));
-  Serial.print(temp_setpoint);
-  Serial.print(F("°C "));
-
-  Serial.print(F("HIST[OP: "));
-  Serial.print(temp_setpoint + TEMP_VENT_HISTERESIS);
-  Serial.print(F("°C  "));
-
-  Serial.print(F("CL: "));
-  Serial.print(temp_setpoint - TEMP_VENT_HISTERESIS);
-  Serial.print(F("°C] "));
-
-  float temp_current = ctrl_steering_get_current_temp();
-  Serial.print(F("CTRL_STEERING: Cur: "));
-  Serial.print(temp_current);
-  Serial.println(F("°C"));
-
-#endif
 }
 
 void srv_ui_serial_ed_l298_report()
@@ -223,7 +261,6 @@ void srv_ui_serial_ed_l298_report()
 #endif
 }
 
-
 void srv_ui_serial_dd_motor_report()
 {
 #ifdef USE_DD_DC_MOTOR
@@ -240,7 +277,7 @@ void srv_ui_serial_dd_motor_report()
 
     Serial.print(F("   "));
   }
-  Serial.println();  
+  Serial.println();
 #endif
 }
 
@@ -264,17 +301,10 @@ void srv_ui_serial_ed_pot_report()
 void srv_ui_serial_dd_encoder_report()
 {
 #ifdef USE_DD_ENCODER
-  if (ed_dht_GetTemperatureError() == 0)
-  {
-    float temp = ed_dht_GetTemperature();
-    Serial.print(F("ED_DHT Temperature: "));
-    Serial.print(temp);
-    Serial.println(F("°C"));
-  }
-  else
-  {
-    Serial.println(F("ED_DHT Error reading temperature!"));
-  }
+  float enc_cnt = dd_encoder_get_counter();
+  Serial.print(F("DD_ENCODER Counter: "));
+  Serial.print(enc_cnt);
+  Serial.println();
 #endif
 }
 
@@ -294,19 +324,134 @@ void srv_ui_serial_dd_sns_angle_report()
 void srv_ui_serial_ctrl_traction_report()
 {
 #ifdef USE_CTRL_TRACTION
-  // if (ctrl_traction_is_enabled())
-  // {
-  //   Serial.println(F("CTRL_TRACTION: Enabled "));
-  // }
-  // else
-  // {
-  //   Serial.println(F("CTRL_TRACTION: Disabled"));
-  // }
 
-  int16_t tract_pow = ctrl_traction_get_power();
-  Serial.print(F("CTRL_TRACTION: Pow = "));
-  Serial.println(tract_pow);
+  Serial.print(F("CTRL_TRACTION:"));
+
+  if (ctrl_traction_is_enabled())
+  {
+    Serial.print(F(" ENABLE "));
+  }
+  else
+  {
+    Serial.print(F(" DISABLE "));
+  }
+
+  Serial.print(F("Ctrl -"));
+
+  if (ctrl_traction_get_target_mode() == CTRL_TRACTION_TARGET_MODE_CAN)
+  {
+    Serial.print(F(" CAN "));
+  }
+  else if (ctrl_traction_get_target_mode() == CTRL_TRACTION_TARGET_MODE_BT)
+  {
+    Serial.print(F(" BT "));
+  }
+  else if (ctrl_traction_get_target_mode() == CTRL_TRACTION_TARGET_MODE_MANUAL)
+  {
+    Serial.print(F(" MANUAL "));
+  }
+  else
+  {
+    Serial.print(F(" UNKNOWN  "));
+  }
+
+  Serial.print(F("FB - "));
+
+  if (ctrl_traction_get_fb_mode() == CTRL_TRACTION_FB_MODE_POTENTIOMETER)
+  {
+    Serial.print(F("POTENTIOMETER  "));
+  }
+  else if (ctrl_traction_get_fb_mode() == CTRL_TRACTION_FB_MODE_TIMER)
+  {
+    Serial.print(F("TIMER "));
+  }
+  else if (ctrl_traction_get_fb_mode() == CTRL_TRACTION_FB_MODE_ENCODER)
+  {
+    Serial.print(F("ENCODER  "));
+  }
+  else
+  {
+    Serial.print(F(" UNKNOWN  "));
+  }
+
+  int16_t ctrl_power = ctrl_traction_get_power();
+  Serial.print(F("Power = "));
+  Serial.print(ctrl_power);
+
+  int16_t current_step = ctrl_traction_get_current_step();
+  Serial.print(F(": CS = "));
+  Serial.print(current_step);
+
+  int16_t target_step = ctrl_traction_get_target_step();
+  Serial.print(F(" TS = "));
+  Serial.println(target_step);
 
 #endif
 }
 
+void srv_ui_serial_ctrl_steering_report()
+{
+#ifdef USE_CTRL_STEERING
+  Serial.print(F("CTRL_STEERING:"));
+
+  if (ctrl_steering_is_enabled())
+  {
+    Serial.print(F(" ENABLE "));
+  }
+  else
+  {
+    Serial.print(F(" DISABLE "));
+  }
+
+  Serial.print(F("Ctrl -"));
+
+  if (ctrl_steering_get_target_mode() == CTRL_STEERING_TARGET_MODE_CAN)
+  {
+    Serial.print(F(" CAN "));
+  }
+  else if (ctrl_steering_get_target_mode() == CTRL_STEERING_TARGET_MODE_BT)
+  {
+    Serial.print(F(" BT "));
+  }
+  else if (ctrl_steering_get_target_mode() == CTRL_STEERING_TARGET_MODE_MANUAL)
+  {
+    Serial.print(F(" MANUAL "));
+  }
+  else
+  {
+    Serial.print(F(" UNKNOWN  "));
+  }
+
+  Serial.print(F("FB - "));
+
+  if (ctrl_steering_get_fb_mode() == CTRL_STEERING_FB_MODE_POTENTIOMETER)
+  {
+    Serial.print(F("POTENTIOMETER  "));
+  }
+  else if (ctrl_steering_get_fb_mode() == CTRL_STEERING_FB_MODE_TIMER)
+  {
+    Serial.print(F("TIMER "));
+  }
+  else if (ctrl_steering_get_fb_mode() == CTRL_STEERING_FB_MODE_ENCODER)
+  {
+    Serial.print(F("ENCODER  "));
+  }
+  else
+  {
+    Serial.print(F(" UNKNOWN  "));
+  }
+
+  int16_t ctrl_power = ctrl_steering_get_power();
+  Serial.print(F("Power = "));
+  Serial.print(ctrl_power);
+
+  int16_t current_angle = ctrl_steering_get_current_angle();
+  Serial.print(F(": CA = "));
+  Serial.print(current_angle);
+
+  float target_angle = ctrl_steering_get_target_angle();
+  Serial.print(F(" TA = "));
+  Serial.println(target_angle);
+
+#endif
+}

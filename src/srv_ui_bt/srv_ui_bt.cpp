@@ -6,6 +6,7 @@ SoftwareSerial srv_ui_bt_Serial(2, 3); // RX, TX
 
 float srv_bt_ui_key_status[SRV_UI_BT_KEY_ID_NR_OF] = {0, 0, 0, 0, 0, 0, 0, 0};
 float srv_bt_ui_key_status_max[SRV_UI_BT_KEY_ID_NR_OF] = {100, 100, 100, 100, 100, 100, 100, 100};
+float srv_bt_ui_key_status_min[SRV_UI_BT_KEY_ID_NR_OF] = {0, 0, 0, 0, 0, 0, 0, 0};
 float srv_bt_ui_key_inc[SRV_UI_BT_KEY_ID_NR_OF] = {1, 1, 1, 1, 1, 1, 1, 1};
 float srv_bt_ui_key_dec[SRV_UI_BT_KEY_ID_NR_OF] = {1, 1, 1, 1, 1, 1, 1, 1};
 char srv_bt_ui_key_char[SRV_UI_BT_KEY_ID_NR_OF] = {'F', 'B', 'L', 'R', 'G', 'I', 'H', 'J'};
@@ -47,18 +48,20 @@ void srv_ui_bt_loop()
 
         default:
             size_t key_id = srv_ui_bt_get_key_id(cmd);
+
             if (key_id < SRV_UI_BT_KEY_ID_NR_OF && key_id >= 0)
             {
-                // increment the key status
-                srv_bt_ui_key_status[key_id] += srv_bt_ui_key_inc[key_id];
+                // increment the key status x2 (dec at the end of the loop)
+                srv_bt_ui_key_status[key_id] += srv_bt_ui_key_inc[key_id] * 2;
 
-                // compensation for the dec at the end of the loop
-                srv_bt_ui_key_status[key_id] += srv_bt_ui_key_dec[key_id];
-
-                if (srv_bt_ui_key_status[key_id] > srv_bt_ui_key_status_max[key_id])
-                {
-                    srv_bt_ui_key_status[key_id] = srv_bt_ui_key_status_max[key_id];
-                }
+#ifdef SRV_UI_BT_DEBUG
+                Serial.print(F("SRV_UI_BT: Received command: "));
+                Serial.println(cmd);
+                Serial.print(F("SRV_UI_BT: KeyID: "));
+                Serial.println(key_id);
+                Serial.print(F("SRV_UI_BT: KeyID Status: "));
+                Serial.println(srv_bt_ui_key_status[key_id]);
+#endif
             }
             else
             {
@@ -71,13 +74,20 @@ void srv_ui_bt_loop()
     // decrement the key status for all keys at the end of the loop
     for (uint8_t key_id = 0; key_id < SRV_UI_BT_KEY_ID_NR_OF; key_id++)
     {
-        if (srv_bt_ui_key_status[key_id] > 0)
+
+        srv_bt_ui_key_status[key_id] -= srv_bt_ui_key_dec[key_id];
+    }
+
+    // limit the key status
+    for (uint8_t key_id = 0; key_id < SRV_UI_BT_KEY_ID_NR_OF; key_id++)
+    {
+        if (srv_bt_ui_key_status[key_id] > srv_bt_ui_key_status_max[key_id])
         {
-            srv_bt_ui_key_status[key_id] -= srv_bt_ui_key_dec[key_id];
+            srv_bt_ui_key_status[key_id] = srv_bt_ui_key_status_max[key_id];
         }
-        else
+        else if (srv_bt_ui_key_status[key_id] < srv_bt_ui_key_status_min[key_id])
         {
-            srv_bt_ui_key_status[key_id] = 0;
+            srv_bt_ui_key_status[key_id] = srv_bt_ui_key_status_min[key_id];
         }
     }
 

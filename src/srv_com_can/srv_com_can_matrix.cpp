@@ -67,7 +67,7 @@ void dd_can_matrix_setup()
     }
 
     // register TX Messages
-    for (uint8_t can_item = 0 + RX_CAN_ID_NR_OF - 1; can_item < TX_CAN_ID_NR_OF; can_item++)
+    for (uint8_t can_item = 0 + RX_CAN_ID_NR_OF; can_item < TX_CAN_ID_NR_OF+RX_CAN_ID_NR_OF; can_item++)
     {
         dd_can_matrix[can_item].id = dd_can_tx_list[can_item];
         dd_can_matrix[can_item].direction = TX_MSG; // tx

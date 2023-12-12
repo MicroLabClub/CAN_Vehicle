@@ -22,15 +22,15 @@ void dd_dc_motor_loop()
         int16_t motor_power = dd_dc_motor_get_power(i);
         if (motor_power > 0)
         {
-            ed_l298_set(ED_L298_ID_1, HIGH, LOW, motor_power);
+            ed_l298_set(i, HIGH, LOW, motor_power);
         }
         else if (motor_power < 0)
         {
-            ed_l298_set(ED_L298_ID_1, LOW, HIGH, -motor_power);
+            ed_l298_set(i, LOW, HIGH, -motor_power);
         }
         else
         {
-            ed_l298_set(ED_L298_ID_1, LOW, LOW, 0);
+            ed_l298_set(i, LOW, LOW, 0);
         }
         // ed_l298_set(dd_motor_driver_id[i],
         //             dd_motor_power[i] > 0,

@@ -11,7 +11,7 @@ void dd_can_signal_loop()
     #ifdef USE_DD_JOYSTICK
     dd_can_signal_set_joistick();
     #endif
-    #ifdef USE_UI_BT
+    #ifdef USE_SRV_UI_BT
     dd_can_signal_set_ui_bt();
     dd_can_signal_set_bt_ui_chassis();
     #endif
@@ -35,7 +35,8 @@ void dd_can_signal_set_joistick()
         tx_buff->tx_msg[3] = y & 0xFF;        // Low Byte Y
         tx_buff->tx_msg[4] = b; // Button state
     } else {
-        Serial.println(F("JOISTICK: tx_buff is NULL"));
+        Serial.print(F("JOISTICK: tx_buff is NULL , tx_ID:"));
+        Serial.println(CAN_ID_JOYSTICK,HEX);
     }
 }
 
