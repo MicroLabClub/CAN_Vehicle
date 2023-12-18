@@ -47,7 +47,7 @@
 
 void srv_ui_serial_setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Vehicle System started");
 }
 

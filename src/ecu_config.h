@@ -7,19 +7,21 @@
 #define ECU_STEERING 3
 #define ECU_TRACTION 4
 #define ECU_OMNIWHEEL 5
+#define ECU_AGROBOT_ATV 6
 
 
 
 
 
+// #define ECU_CONFIG ECU_TST
 
 // #define ECU_CONFIG ECU_UI_BLUETOOTH
 // #define ECU_CONFIG ECU_UI_LCD
 // #define ECU_CONFIG ECU_TRACTION
-// #define ECU_CONFIG ECU_OMNIWHEEL
-#define ECU_CONFIG ECU_STEERING
-// #define ECU_CONFIG ECU_TST
+// #define ECU_CONFIG ECU_STEERING
 
+#define ECU_CONFIG ECU_OMNIWHEEL
+// #define ECU_CONFIG ECU_AGROBOT_ATV
 
 
 #define CAN_ID_BUZZER   0x111
@@ -72,14 +74,18 @@
 
 #include "ecu_config_omniwheel.h"
 
+#elif ECU_CONFIG == ECU_AGROBOT_ATV
+
+#include "ecu_config_agrobot.h"
+
 #endif
 
 // BUZZER ECU CONFIG
 #define ED_BUZZER_PIN A6
 
 // CAN MCP ECU CONFIG
-#define CAN0_INT 2 // Set INT to pin 2
-#define CAN0_CS 10 // Set CS to pin 2
+// #define CAN0_INT 2 // Set INT to pin 2
+// #define CAN0_CS 10 // Set CS to pin 2
 
 // JOYSTICK ECU CONFIG
 // Joystick PinMap

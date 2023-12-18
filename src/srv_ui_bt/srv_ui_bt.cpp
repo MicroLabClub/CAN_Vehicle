@@ -5,14 +5,16 @@
 SoftwareSerial srv_ui_bt_Serial(2, 3); // RX, TX
 
 float srv_bt_ui_key_status[SRV_UI_BT_KEY_ID_NR_OF] = {0, 0, 0, 0, 0, 0, 0, 0};
-float srv_bt_ui_key_status_max[SRV_UI_BT_KEY_ID_NR_OF] = {100, 100, 100, 100, 100, 100, 100, 100};
+float srv_bt_ui_key_status_max[SRV_UI_BT_KEY_ID_NR_OF] = {100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000};
 float srv_bt_ui_key_status_min[SRV_UI_BT_KEY_ID_NR_OF] = {0, 0, 0, 0, 0, 0, 0, 0};
 float srv_bt_ui_key_inc[SRV_UI_BT_KEY_ID_NR_OF] = {1, 1, 1, 1, 1, 1, 1, 1};
-float srv_bt_ui_key_dec[SRV_UI_BT_KEY_ID_NR_OF] = {1, 1, 1, 1, 1, 1, 1, 1};
+float srv_bt_ui_key_dec[SRV_UI_BT_KEY_ID_NR_OF] = { 1, 1, 1, 1, 1, 1, 1, 1};
 char srv_bt_ui_key_char[SRV_UI_BT_KEY_ID_NR_OF] = {'F', 'B', 'L', 'R', 'G', 'I', 'H', 'J'};
 
 int16_t srv_ui_bt_power = 0;
 int16_t srv_ui_bt_steering = 0;
+
+int8_t srv_ui_bt_roll_back_mode = SRV_UI_BT_ROLLBACK_DEFAULT;
 
 int16_t srv_ui_bt_get_power()
 {
@@ -45,14 +47,30 @@ void srv_ui_bt_loop()
         case 'S':
             /* Heart beat */
             break;
+        case 'U':
+        case 'u': 
+        case 'W':
+        case 'w':
+            for (uint8_t key_id = 0; key_id < SRV_UI_BT_KEY_ID_NR_OF; key_id++)
+            {
+                srv_bt_ui_key_status[key_id] = 0;
+            }
+            break;
 
         default:
+
+            // Serial.print(F("SRV_UI_BT: Received command: "));
+            // Serial.println(cmd);
             size_t key_id = srv_ui_bt_get_key_id(cmd);
 
             if (key_id < SRV_UI_BT_KEY_ID_NR_OF && key_id >= 0)
             {
                 // increment the key status x2 (dec at the end of the loop)
-                srv_bt_ui_key_status[key_id] += srv_bt_ui_key_inc[key_id] * 2;
+                srv_bt_ui_key_status[key_id] += srv_bt_ui_key_inc[key_id];
+                if (srv_ui_bt_roll_back_mode == SRV_UI_BT_ROLLBACK_ENABLED)
+                {
+                    srv_bt_ui_key_status[key_id] += srv_bt_ui_key_inc[key_id];
+                }
 
 #ifdef SRV_UI_BT_DEBUG
                 Serial.print(F("SRV_UI_BT: Received command: "));
@@ -75,7 +93,10 @@ void srv_ui_bt_loop()
     for (uint8_t key_id = 0; key_id < SRV_UI_BT_KEY_ID_NR_OF; key_id++)
     {
 
-        srv_bt_ui_key_status[key_id] -= srv_bt_ui_key_dec[key_id];
+        if (srv_ui_bt_roll_back_mode == SRV_UI_BT_ROLLBACK_ENABLED)
+        {
+            srv_bt_ui_key_status[key_id] -= srv_bt_ui_key_dec[key_id];
+        }
     }
 
     // limit the key status

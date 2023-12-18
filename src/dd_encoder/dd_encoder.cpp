@@ -10,19 +10,19 @@
  
 
 
- uint16_t counter = 0; 
+ int16_t counter = 0; 
  int aState;
  int aLastState;  
 
- uint16_t  dd_encoder_get_counter(){
+ int16_t  dd_encoder_get_counter(){
     return counter;
  }
 
-uint16_t  dd_encoder_set_counter(uint16_t cnt){
+int16_t  dd_encoder_set_counter(int16_t cnt){
     counter = cnt;
     return counter;
 }
-uint16_t  dd_encoder_reset_counter(){
+int16_t  dd_encoder_reset_counter(){
     counter = dd_encoder_set_counter(0);
     return counter;
 }
@@ -52,7 +52,7 @@ uint16_t  dd_encoder_reset_counter(){
  }
 
  void dd_encoder_report(){
-    uint16_t cnt = dd_encoder_get_counter();
+    int16_t cnt = dd_encoder_get_counter();
     Serial.print(F("ED_ENCD: Counter = "));
     Serial.println(cnt);
  }

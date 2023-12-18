@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "ctrl_traction.h"
-#include "ecu_config.h"
 #include "srv_com_can/srv_com_can_signal.h"
+#include "srv_ui_bt/srv_ui_bt.h"
 #include "ed_l298/ed_l298.h"
 #include "dd_dc_motor/dd_dc_motor.h"
 #include "dd_encoder/dd_encoder.h"
@@ -188,25 +188,26 @@ void ctrl_traction_loop()
         {
             if (ctrl_traction_op_mode == CTRL_TRACTION_OP_MODE_STEP)
             {
-                traction_power = dd_can_signal_get_bt_ui_power() * 2;
-                ctrl_traction_set_power(traction_power);
+                target_step = dd_can_signal_get_bt_ui_steering() * 2;
+                ctrl_traction_set_target_step(traction_power);
             }
-            // else{
-            //     target_step = dd_can_signal_get_bt_ui_power() * 2;
-            // }
+            else{
+                traction_power = dd_can_signal_get_bt_ui_power() * 2;
+            }
         }
         else if (ctrl_traction_target_mode == CTRL_TRACTION_TARGET_MODE_BT)
         {
-            // target_step = srv_bt_ui_get_traction();
-            // ctrl_traction_set_target_step(target_step);
+            traction_power = srv_ui_bt_get_power()*2;
+            ctrl_traction_set_power(traction_power);
         }
 
         else if (ctrl_traction_target_mode == CTRL_TRACTION_TARGET_MODE_MANUAL)
         {
-            target_step = ctrl_traction_get_target_step();
+            traction_power = ctrl_traction_get_power();
         }
 
         ctrl_traction_set_target_step(target_step);
+        ctrl_traction_set_power(traction_power);
 
         if (ctrl_traction_op_mode == CTRL_TRACTION_OP_MODE_STEP)
         {   

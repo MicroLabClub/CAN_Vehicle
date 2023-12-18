@@ -4,7 +4,7 @@
 
 #define USE_SRV_UI_SERIAL
 // #define USE_DC_MOTOR
-#define USE_DD_JOYSTICK
+// #define USE_DD_JOYSTICK
 // #define USE_ED_BUZZER
 #define USE_ED_CAN_MCP
 // #define USE_ED_ESC
@@ -19,8 +19,10 @@
 #define CAN0_INT 2 // Set INT to pin 2
 #define CAN0_CS 10 // Set CS to pin 2
 
-#define TX_CAN_ID_NR_OF 3
-#define TX_CAN_ID_LIST {CAN_ID_JOYSTICK, CAN_ID_UI_BT, CAN_ID_UI_BT_CHASSIS}
+#define SRV_UI_BT_ROLLBACK_DEFAULT SRV_UI_BT_ROLLBACK_DISABLED
+
+#define TX_CAN_ID_NR_OF 2
+#define TX_CAN_ID_LIST { CAN_ID_UI_BT, CAN_ID_UI_BT_CHASSIS}
 #define RX_CAN_ID_NR_OF 0
 #define RX_CAN_ID_LIST {}
 

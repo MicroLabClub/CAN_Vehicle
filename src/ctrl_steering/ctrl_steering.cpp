@@ -1,13 +1,13 @@
 #include "Arduino.h"
 #include "ctrl_steering.h"
-#include "ecu_config.h"
 #include "srv_com_can/srv_com_can_signal.h"
-#include "ed_l298/ed_l298.h"
+#include "srv_ui_bt/srv_ui_bt.h"
 #include "dd_dc_motor/dd_dc_motor.h"
 #include "dd_encoder/dd_encoder.h"
+#include "ed_l298/ed_l298.h"
 
-#define CTRL_STEERING_ANGLE_MAX (100)
-#define CTRL_STEERING_ANGLE_MIN (-100)
+#define CTRL_STEERING_ANGLE_MAX (10000)
+#define CTRL_STEERING_ANGLE_MIN (-10000)
 
 uint8_t ctrl_steering_target_mode = CTRL_STEERING_TARGET_MODE;
 uint8_t ctrl_steering_fb_mode = CTRL_STEERING_FB_MODE;
@@ -193,8 +193,8 @@ void ctrl_steering_loop()
         }
         else if (ctrl_steering_target_mode == CTRL_STEERING_TARGET_MODE_BT)
         {
-            // target_angle = srv_bt_ui_get_steering();
-            // ctrl_steering_set_target_angle(target_angle);
+            target_angle = srv_ui_bt_get_steering();
+            ctrl_steering_set_target_angle(target_angle);
         }
         else if (ctrl_steering_target_mode == CTRL_STEERING_TARGET_MODE_MANUAL)
         {

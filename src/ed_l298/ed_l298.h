@@ -1,9 +1,8 @@
 
 #ifndef ED_DRIVER_H
 #define ED_DRIVER_H
-
-
 #include "stdint.h"
+#include "ecu_config.h"
 
 typedef struct ed_l298{
     uint8_t in_1;
@@ -11,15 +10,20 @@ typedef struct ed_l298{
     uint16_t en;
 } ed_l298_t;
 
-
+#ifndef ED_L298_IN_1_PIN_LIST
 #define ED_L298_IN_1_PIN_LIST { 7}
+#endif
+#ifndef ED_L298_IN_2_PIN_LIST
 #define ED_L298_IN_2_PIN_LIST { 8}
+#endif
+#ifndef ED_L298_EN_PIN_LIST
 #define ED_L298_EN_PIN_LIST { 9}
+#endif
 
 enum dd_driver_id_t{
     ED_L298_ID_1,
     ED_L298_ID_2,
-    ED_L298_NR_OF
+    ED_L298_NR_OF 
 };
 
 

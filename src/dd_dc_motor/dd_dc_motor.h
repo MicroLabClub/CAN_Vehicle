@@ -2,12 +2,16 @@
 #define DD_DC_MOTOR_H
 
 #include "stdint.h"
+#include "ecu_config.h"
 
 #define DD_DC_MOTOR_DRIVER_ID_LIST {ED_L298_ID_1}
 
+#ifndef DD_DC_MOTOR_MAX_POWER
 #define DD_DC_MOTOR_MAX_POWER 255
+#endif
+#ifndef DD_DC_MOTOR_MIN_POWER
 #define DD_DC_MOTOR_MIN_POWER -255
-
+#endif
 
 enum dd_dc_motor_id_t{
     DD_DC_MOTOR_ID_1,

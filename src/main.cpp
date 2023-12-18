@@ -147,11 +147,11 @@ int ed_l298_rec_cnt = ED_L298_REC + 5;
 #define CTRL_TRACTION_REC (1000 / SYS_TICK)
 int ctrl_traction_rec_cnt = CTRL_TRACTION_REC + 5;
 
-#define CTRL_STEERING_REC (100 / SYS_TICK)
+#define CTRL_STEERING_REC (10 / SYS_TICK)
 int ctrl_steering_rec_cnt = CTRL_STEERING_REC + 5;
 
 
-#define DD_DC_MOTOR_REC (100 / SYS_TICK)
+#define DD_DC_MOTOR_REC (10 / SYS_TICK)
 int dd_dc_motor_rec_cnt = DD_DC_MOTOR_REC + 5;
 
 void loop()

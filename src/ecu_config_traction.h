@@ -16,6 +16,21 @@
 // #define USE_SRV_UI_LCD
 #define USE_CTRL_TRACTION
 
+#define CTRL_TRACTION_TARGET_MODE CTRL_TRACTION_TARGET_MODE_CAN
+#define CTRL_TRACTION_OP_MODE CTRL_TRACTION_OP_MODE_POWER
+
+#ifndef ED_L298_IN_1_PIN_LIST
+#define ED_L298_IN_1_PIN_LIST {4, 7}
+#endif
+#ifndef ED_L298_IN_2_PIN_LIST
+#define ED_L298_IN_2_PIN_LIST {5, 8}
+#endif
+#ifndef ED_L298_EN_PIN_LIST
+#define ED_L298_EN_PIN_LIST {6, 9}
+#endif
+
+
+
 #define TX_CAN_ID_NR_OF 0
 #define TX_CAN_ID_LIST {}
 #define RX_CAN_ID_NR_OF 1

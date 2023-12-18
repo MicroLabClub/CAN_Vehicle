@@ -1,6 +1,6 @@
 #ifndef CTRL_TRACTION_H
 #define CTRL_TRACTION_H
-
+#include "ecu_config.h"
 // Include any necessary headers here
 
 // Define any constants or macros here
@@ -20,6 +20,7 @@
 #ifndef CTRL_TRACTION_FB_MODE
 #define CTRL_TRACTION_FB_MODE CTRL_TRACTION_FB_MODE_TIMER
 #endif
+
 
 #define CTRL_TRACTION_OP_MODE_STEP 0
 #define CTRL_TRACTION_OP_MODE_CONTINUOUS 1
